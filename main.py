@@ -1,8 +1,6 @@
 import pygame
 from sys import exit
-import sys
-import random as ra
-from pygame.sprite import Group
+from random import randint
 
 # Game
 
@@ -171,11 +169,11 @@ def start_game():
 
         if tower_time <= 0 and entity.sprite.vital:
             x_top, x_bot = 550, 550
-            y_top = ra.randint(-600, -480)
-            y_bot = y_top + ra.randint(90, 130) + bottom_tower_pic.get_height()
+            y_top = randint(-600, -480)
+            y_bot = y_top + randint(90, 130) + bottom_tower_pic.get_height()
             towers.add(Tower(x_top, y_top, top_tower_pic, "top"))
             towers.add(Tower(x_bot, y_bot, bottom_tower_pic, "bot"))
-            tower_time = ra.randint(180, 250)
+            tower_time = randint(180, 250)
         tower_time -= 1
 
         clock.tick(60)
