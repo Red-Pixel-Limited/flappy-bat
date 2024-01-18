@@ -1,39 +1,48 @@
-import pygame as pg
+import pygame
 from sys import exit
 import random as ra
 from pygame.sprite import Group
 
-pg.init()
-clock = pg.time.Clock()
+# Game
 
-s_height = 700
-s_width = 551
-screen = pg.display.set_mode((s_width, s_height))
+pygame.init()
 
-entity_pics = [pg.image.load("graphics/bat_up.png").convert_alpha(),
-               pg.image.load("graphics/bat_down.png").convert_alpha(),
-               pg.image.load("graphics/bat_mid.png").convert_alpha()]
-
-top_tower_pic = pg.image.load("graphics/tower_top.png")
-bottom_tower_pic = pg.image.load("graphics/tower_bottom.png")
-game_over_pic = pg.image.load("graphics/game_over.png")
-start_game_pic = pg.image.load("graphics/start.png")
-sky_pic = pg.image.load("graphics/background.png")
-ground_pic = pg.image.load("graphics/ground.png")
-
+window_height = 700
+window_width = 551
 scroll_speed = 2
-entity_begin_pos = (100, 250)
-points = 0
-font = pg.font.SysFont("Segoe", 30)
-game_over = True
+scores = 0
+
+screen = pygame.display.set_mode((window_width, window_height))
+clock = pygame.time.Clock()
+font = pygame.font.SysFont("Segoe", 30)
+
+start_game_pic = pygame.image.load("graphics/start.png")
+game_over_pic = pygame.image.load("graphics/game_over.png")
+
+# Background
+
+sky_pic = pygame.image.load("graphics/background.png")
+ground_pic = pygame.image.load("graphics/ground.png")
+
+# Tower
+
+top_tower_pic = pygame.image.load("graphics/tower_top.png")
+bottom_tower_pic = pygame.image.load("graphics/tower_bottom.png")
+
+# Bat
+
+bat_pos = (100, 250)
+bat_pics = [pygame.image.load("graphics/bat_up.png").convert_alpha(),
+            pygame.image.load("graphics/bat_down.png").convert_alpha(),
+            pygame.image.load("graphics/bat_mid.png").convert_alpha()]
 
 
-class Entity(pg.sprite.Sprite):
+class Bat(pygame.sprite.Sprite):
     def __init__(self):
-        pg.sprite.Sprite.__init__(self)
-        self.image = entity_pics[0]
+        pygame.sprite.Sprite.__init__(self)
+        self.image = bat_pics[0]
         self.rect = self.image.get_rect()
-        self.rect.center = entity_begin_pos
+        self.rect.center = bat_pos
         self.image_index = 0
         self.velocity = 0
         self.jump = False
@@ -44,7 +53,7 @@ class Entity(pg.sprite.Sprite):
             self.image_index += 1
         if self.image_index >= 30:
             self.image_index = 0
-        self.image = entity_pics[self.image_index // 10]
+        self.image = bat_pics[self.image_index // 10]
 
         self.velocity += 0.5
         if self.velocity > 7:
@@ -54,16 +63,16 @@ class Entity(pg.sprite.Sprite):
         if self.velocity == 0:
             self.jump = False
 
-        self.image = pg.transform.rotate(self.image, self.velocity * -7)
+        self.image = pygame.transform.rotate(self.image, self.velocity * -7)
 
-        if user_input[pg.K_SPACE] and not self.jump and self.rect.y > 0 and self.vital:
+        if user_input[pygame.K_SPACE] and not self.jump and self.rect.y > 0 and self.vital:
             self.jump = True
             self.velocity = -7
 
 
-class Tower(pg.sprite.Sprite):
+class Tower(pygame.sprite.Sprite):
     def __init__(self, x, y, image, tower_type):
-        pg.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
@@ -72,90 +81,93 @@ class Tower(pg.sprite.Sprite):
 
     def update(self):
         self.rect.x -= scroll_speed
-        if self.rect.x <= -s_width:
+        if self.rect.x <= -window_width:
             self.kill()
 
-        global points
+        global scores
         if self.tower_type == "bot":
-            if entity_begin_pos[0] > self.rect.topleft[0] and not self.pas:
+            if bat_pos[0] > self.rect.topleft[0] and not self.pas:
                 self.enter = True
-            if entity_begin_pos[0] > self.rect.topright[0] and not self.pas:
+            if bat_pos[0] > self.rect.topright[0] and not self.pas:
                 self.leave = True
             if self.enter and self.leave and not self.pas:
                 self.pas = True
-                points += 1
+                scores += 1
 
 
-class Ground(pg.sprite.Sprite):
+class Ground(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        pg.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self)
         self.image = ground_pic
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
 
     def update(self):
         self.rect.x -= scroll_speed
-        if self.rect.x <= -s_width:
+        if self.rect.x <= -window_width:
             self.kill()
 
 
 def close_game():
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            pg.quit()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
             exit()
 
 
-def main():
-    global points
-    entity = pg.sprite.GroupSingle()
-    entity.add(Entity())
+def start_game():
+    global scores
+    entity = pygame.sprite.GroupSingle()
+    entity.add(Bat())
 
     tower_time = 0
-    towers = pg.sprite.Group()
+    towers = pygame.sprite.Group()
 
     x_posit_ground, y_posit_ground = 0, 520
-    ground = pg.sprite.Group()
+    ground = pygame.sprite.Group()
     ground.add(Ground(x_posit_ground, y_posit_ground))
 
-    run = True
-    while run:
+    while True:
         close_game()
 
         screen.fill((0, 0, 0))
 
-        user_input = pg.key.get_pressed()
+        user_input = pygame.key.get_pressed()
 
         screen.blit(sky_pic, (0, 0))
 
         if len(ground) <= 2:
-            ground.add(Ground(s_width, y_posit_ground))
+            ground.add(Ground(window_width, y_posit_ground))
 
         towers.draw(screen)
         ground.draw(screen)
         entity.draw(screen)
 
-        point_text = font.render(
-            "Points: " + str(points), True, pg.Color(255, 255, 255))
-        screen.blit(point_text, (20, 20))
+        scores_text = font.render(
+            "Scores: " + str(scores),
+            True,
+            pygame.Color(255, 255, 255)
+        )
+
+        screen.blit(scores_text, (20, 20))
 
         if entity.sprite.vital:
             towers.update()
             ground.update()
             entity.update(user_input)
 
-        col_towers = pg.sprite.spritecollide(
+        col_towers = pygame.sprite.spritecollide(
             entity.sprites()[0], towers, False)
-        col_ground = pg.sprite.spritecollide(
+        col_ground = pygame.sprite.spritecollide(
             entity.sprites()[0], ground, False)
         if col_ground or col_towers:
             entity.sprite.vital = False
             if col_ground or col_towers:
-                screen.blit(game_over_pic, (s_width//2 - game_over_pic.get_width()//2,
-                                            s_height//2 - game_over_pic.get_height()//2))
+                screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2,
+                                            window_height//2 - game_over_pic.get_height()//2))
 
-                if user_input[pg.K_r]:
-                    points = 0
+                if user_input[pygame.K_r]:
+                    scores = 0
                     break
 
         if tower_time <= 0 and entity.sprite.vital:
@@ -168,27 +180,26 @@ def main():
         tower_time -= 1
 
         clock.tick(60)
-        pg.display.update()
+        pygame.display.update()
 
 
-def menu():
-    global game_over
+def main():
 
-    while game_over:
+    while True:
         close_game()
 
         screen.fill((0, 0, 0))
         screen.blit(sky_pic, (0, 0))
         screen.blit(ground_pic, (0, 520))
-        screen.blit(entity_pics[0], (100, 250))
-        screen.blit(start_game_pic, (s_width//2 - start_game_pic.get_width()//2,
-                                     s_height//2 - start_game_pic.get_height()//2))
+        screen.blit(bat_pics[0], (100, 250))
+        screen.blit(start_game_pic, (window_width//2 - start_game_pic.get_width()//2,
+                                     window_height//2 - start_game_pic.get_height()//2))
 
-        user_input = pg.key.get_pressed()
-        if user_input[pg.K_SPACE]:
-            main()
+        user_input = pygame.key.get_pressed()
+        if user_input[pygame.K_SPACE]:
+            start_game()
 
-        pg.display.update()
+        pygame.display.update()
 
 
-menu()
+main()
