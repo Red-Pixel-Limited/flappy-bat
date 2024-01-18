@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+import sys
 import random as ra
 from pygame.sprite import Group
 
@@ -107,13 +108,11 @@ class Ground(pygame.sprite.Sprite):
         if self.rect.x <= -window_width:
             self.kill()
 
-
-def close_game():
+def check_to_quit():
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            pygame.display.quit()
             exit()
-
 
 def start_game():
     global scores
@@ -128,7 +127,7 @@ def start_game():
     ground.add(Ground(x_posit_ground, y_posit_ground))
 
     while True:
-        close_game()
+        check_to_quit()
 
         screen.fill((0, 0, 0))
 
@@ -143,11 +142,8 @@ def start_game():
         ground.draw(screen)
         entity.draw(screen)
 
-        scores_text = font.render(
-            "Scores: " + str(scores),
-            True,
-            pygame.Color(255, 255, 255)
-        )
+        scores_color = pygame.Color(255, 255, 255)
+        scores_text = font.render("Scores: " + str(scores), True, scores_color)
 
         screen.blit(scores_text, (20, 20))
 
@@ -169,6 +165,9 @@ def start_game():
                 if user_input[pygame.K_r]:
                     scores = 0
                     break
+                elif user_input[pygame.K_ESCAPE]:
+                    pygame.display.quit()
+                    exit()
 
         if tower_time <= 0 and entity.sprite.vital:
             x_top, x_bot = 550, 550
@@ -186,7 +185,7 @@ def start_game():
 def main():
 
     while True:
-        close_game()
+        check_to_quit()
 
         screen.fill((0, 0, 0))
         screen.blit(sky_pic, (0, 0))
@@ -200,6 +199,5 @@ def main():
             start_game()
 
         pygame.display.update()
-
 
 main()
