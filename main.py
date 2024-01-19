@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 from random import randint
+from enum import Enum
 
 # Game
 
@@ -73,15 +74,18 @@ class Bat(pygame.sprite.Sprite):
             self.jump = True
             self.velocity = -7
 
+class TowerPosition(Enum):
+    TOP = 1
+    BOTTOM = 2
 
 class Tower(pygame.sprite.Sprite):
-    def __init__(self, x, y, image, tower_type):
+    def __init__(self, x, y, image, tower_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
         self.enter, self.leave, self.pas = False, False, False
-        self.tower_type = tower_type
+        self.tower_pos = tower_pos
 
     def update(self):
         self.rect.x -= scroll_speed
@@ -89,7 +93,7 @@ class Tower(pygame.sprite.Sprite):
             self.kill()
 
         global scores
-        if self.tower_type == "bot":
+        if self.tower_pos == TowerPosition.BOTTOM:
             if bat_pos[0] > self.rect.topleft[0] and not self.pas:
                 self.enter = True
             if bat_pos[0] > self.rect.topright[0] and not self.pas:
@@ -183,8 +187,8 @@ def start_game():
             x_top, x_bot = 550, 550
             y_top = randint(-600, -480)
             y_bot = y_top + randint(90, 130) + bottom_tower_pic.get_height()
-            towers.add(Tower(x_top, y_top, top_tower_pic, "top"))
-            towers.add(Tower(x_bot, y_bot, bottom_tower_pic, "bot"))
+            towers.add(Tower(x_top, y_top, top_tower_pic, TowerPosition.TOP))
+            towers.add(Tower(x_bot, y_bot, bottom_tower_pic, TowerPosition.BOTTOM))
             tower_time = randint(180, 250)
         tower_time -= 1
 
