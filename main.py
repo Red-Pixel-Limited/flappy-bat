@@ -13,7 +13,7 @@ scores = 0
 
 screen = pygame.display.set_mode((window_width, window_height))
 clock = pygame.time.Clock()
-font = pygame.font.SysFont("Segoe", 30)
+font = pygame.font.SysFont("segoeui", 30)
 
 start_game_pic = pygame.image.load("graphics/start.png")
 game_over_pic = pygame.image.load("graphics/game_over.png")
@@ -106,11 +106,13 @@ class Ground(pygame.sprite.Sprite):
         if self.rect.x <= -window_width:
             self.kill()
 
+
 def check_to_quit():
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             pygame.display.quit()
             exit()
+
 
 def start_game():
     global scores
@@ -176,7 +178,7 @@ def start_game():
             tower_time = randint(180, 250)
         tower_time -= 1
 
-        clock.tick(60)
+        clock.tick(60)/1000.0
         pygame.display.update()
 
 
@@ -197,5 +199,6 @@ def main():
             start_game()
 
         pygame.display.update()
+
 
 main()
