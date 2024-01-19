@@ -23,6 +23,11 @@ game_over_pic = pygame.image.load("graphics/game_over.png")
 sky_pic = pygame.image.load("graphics/background.png")
 ground_pic = pygame.image.load("graphics/ground.png")
 
+# Sounds 
+
+bg_music = pygame.mixer.Sound("audio/decisive_battle_loop.wav")
+game_over_sound = pygame.mixer.Sound("audio/decisive_battle_end.wav")
+
 # Tower
 
 top_tower_pic = pygame.image.load("graphics/tower_top.png")
@@ -116,8 +121,8 @@ def check_to_quit():
 
 def start_game():
     global scores
-    entity = pygame.sprite.GroupSingle()
-    entity.add(Bat())
+    bat = pygame.sprite.GroupSingle()
+    bat.add(Bat())
 
     tower_time = 0
     towers = pygame.sprite.Group()
@@ -125,6 +130,8 @@ def start_game():
     x_posit_ground, y_posit_ground = 0, 520
     ground = pygame.sprite.Group()
     ground.add(Ground(x_posit_ground, y_posit_ground))
+
+    bg_music.play(loops = -1)
 
     while True:
         check_to_quit()
@@ -140,36 +147,39 @@ def start_game():
 
         towers.draw(screen)
         ground.draw(screen)
-        entity.draw(screen)
+        bat.draw(screen)
 
         scores_color = pygame.Color(255, 255, 255)
         scores_text = font.render("Scores: " + str(scores), True, scores_color)
 
         screen.blit(scores_text, (20, 20))
 
-        if entity.sprite.vital:
+        if bat.sprite.vital:
             towers.update()
             ground.update()
-            entity.update(user_input)
+            bat.update(user_input)
 
-        col_towers = pygame.sprite.spritecollide(
-            entity.sprites()[0], towers, False)
-        col_ground = pygame.sprite.spritecollide(
-            entity.sprites()[0], ground, False)
-        if col_ground or col_towers:
-            entity.sprite.vital = False
-            if col_ground or col_towers:
-                screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2,
-                                            window_height//2 - game_over_pic.get_height()//2))
+        collide_towers = pygame.sprite.spritecollide(bat.sprites()[0], towers, False)
+        collide_ground = pygame.sprite.spritecollide(bat.sprites()[0], ground, False)
 
-                if user_input[pygame.K_r]:
-                    scores = 0
-                    break
-                elif user_input[pygame.K_ESCAPE]:
-                    pygame.display.quit()
-                    exit()
+        if collide_ground or collide_towers:
 
-        if tower_time <= 0 and entity.sprite.vital:
+            if bat.sprite.vital:
+                bat.sprite.vital = False
+                bg_music.stop()
+                game_over_sound.play(loops = 0)
+
+            screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2,
+                                        window_height//2 - game_over_pic.get_height()//2))
+
+            if user_input[pygame.K_r]:
+                scores = 0
+                break
+            elif user_input[pygame.K_ESCAPE]:
+                pygame.display.quit()
+                exit()
+
+        if tower_time <= 0 and bat.sprite.vital:
             x_top, x_bot = 550, 550
             y_top = randint(-600, -480)
             y_bot = y_top + randint(90, 130) + bottom_tower_pic.get_height()
