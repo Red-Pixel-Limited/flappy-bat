@@ -64,6 +64,23 @@ class Repository:
         finally:
             conn.close()
 
+    def update_settings(self, player: Player):
+        conn = sqlite3.connect(self.db_file_name)
+        try:
+            cursor = conn.cursor()
+            id = cursor.execute(
+                'SELECT settings_id FROM players WHERE username=?', (player.username,)).fetchone()[0]
+            if id == 1:
+                cursor.execute(
+                    'INSERT INTO settings (volume, mute) VALUES (?, ?)', (player.settings.sound.volume, player.settings.sound.muted))
+                cursor.execute('UPDATE players SET settings_id=? WHERE username=?', (cursor.lastrowid, player.username))
+            else:
+                cursor.execute('UPDATE settings SET volume=?, mute=? WHERE id=?',
+                           (player.settings.sound.volume, player.settings.sound.muted, id))
+            conn.commit()
+        finally:
+            conn.close()
+
     def get_top_20_players(self) -> list[Tuple[str, int]]:
         conn = sqlite3.connect(self.db_file_name)
         try:
