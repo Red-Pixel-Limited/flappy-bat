@@ -14,7 +14,6 @@ scroll_speed = 2
 scores = 0
 
 screen = pygame.display.set_mode((window_width, window_height))
-manager = pygame_gui.UIManager((window_width, window_height), "./themes/menu.json")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("segoeui", 30)
 
@@ -183,8 +182,9 @@ def start_game():
                                         window_height//2 - game_over_pic.get_height()//2))
 
             if user_input[pygame.K_r]:
-                scores = 0
-                break
+                start_game()
+            elif user_input[pygame.K_m]:
+                menu()
             elif user_input[pygame.K_ESCAPE]:
                 pygame.display.quit()
                 exit()
@@ -203,7 +203,9 @@ def start_game():
         pygame.display.update()
 
 
-def main():
+def menu():
+
+    manager = pygame_gui.UIManager((window_width, window_height), "./themes/menu.json")
 
     screen.fill((0, 0, 0))
     screen.blit(sky_pic, (0, 0))
@@ -212,11 +214,13 @@ def main():
 
     x = window_width // 2 - start_game_pic.get_width() // 2
     y = 130
-    screen.blit(start_game_pic, (x, y)) 
+    screen.blit(start_game_pic, (x, y))
 
-    pygame_gui.elements.UIButton(relative_rect=pygame.Rect((195, 230), (155, 40)),  text="Start", manager=manager)
+    start_game_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+        (195, 230), (155, 40)),  text="Start", manager=manager)
 
-    pygame_gui.elements.UIButton(relative_rect=pygame.Rect((195, 280), (155, 40)),  text="Settings", manager=manager)
+    pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+        (195, 280), (155, 40)),  text="Settings", manager=manager)
 
     while True:
         time_delta = clock.tick(60) / 1000.0
@@ -225,6 +229,9 @@ def main():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.display.quit()
                 exit()
+            elif event.type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == start_game_btn:
+                    start_game()
 
             manager.process_events(event)
 
@@ -239,4 +246,4 @@ def main():
         pygame.display.update()
 
 
-main()
+menu()
