@@ -15,15 +15,15 @@ scores = 0
 
 screen = pygame.display.set_mode((window_width, window_height))
 clock = pygame.time.Clock()
-font = pygame.font.SysFont("segoeui", 30)
+font = pygame.font.Font("font/MetaversRounded.otf", 24)
 
-start_game_pic = pygame.image.load("graphics/start.png")
-game_over_pic = pygame.image.load("graphics/game_over.png")
+start_game_pic = pygame.image.load("images/start.png")
+game_over_pic = pygame.image.load("images/game_over.png")
 
 # Background
 
-sky_pic = pygame.image.load("graphics/background.png")
-ground_pic = pygame.image.load("graphics/ground.png")
+sky_pic = pygame.image.load("images/background.png")
+ground_pic = pygame.image.load("images/ground.png")
 
 # Sounds
 
@@ -32,15 +32,15 @@ game_over_sound = pygame.mixer.Sound("audio/decisive_battle_end.wav")
 
 # Tower
 
-top_tower_pic = pygame.image.load("graphics/tower_top.png")
-bottom_tower_pic = pygame.image.load("graphics/tower_bottom.png")
+top_tower_pic = pygame.image.load("images/tower_top.png")
+bottom_tower_pic = pygame.image.load("images/tower_bottom.png")
 
 # Bat
 
 bat_pos = (100, 250)
-bat_pics = [pygame.image.load("graphics/bat_up.png").convert_alpha(),
-            pygame.image.load("graphics/bat_down.png").convert_alpha(),
-            pygame.image.load("graphics/bat_mid.png").convert_alpha()]
+bat_pics = [pygame.image.load("images/bat_up.png").convert_alpha(),
+            pygame.image.load("images/bat_down.png").convert_alpha(),
+            pygame.image.load("images/bat_mid.png").convert_alpha()]
 
 
 class Bat(pygame.sprite.Sprite):
@@ -179,8 +179,7 @@ def start_game():
                 bg_music.stop()
                 game_over_sound.play(loops=0)
 
-            screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2,
-                                        window_height//2 - game_over_pic.get_height()//2))
+            screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2, window_height//3))
 
             if user_input[pygame.K_r]:
                 start_game()
@@ -234,7 +233,8 @@ def menu():
                     event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
                 start_game()
             elif (event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == settings_game_btn):
-                settings_window = pygame_gui.elements.UIWindow(rect=pygame.Rect((100, 100), (200, 100)), window_display_title="Settings", resizable=True)
+                settings_window = pygame_gui.elements.UIWindow(rect=pygame.Rect(
+                    (100, 100), (200, 100)), window_display_title="Settings", resizable=True)
                 settings_window.show()
 
             manager.process_events(event)
