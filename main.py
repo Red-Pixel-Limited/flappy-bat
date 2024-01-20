@@ -30,6 +30,8 @@ ground_pic = pygame.image.load("images/ground.png")
 bg_music = pygame.mixer.Sound("audio/decisive_battle_loop.wav")
 game_over_sound = pygame.mixer.Sound("audio/decisive_battle_end.wav")
 
+bg_music.set_volume(0.5)
+
 # Tower
 
 top_tower_pic = pygame.image.load("images/tower_top.png")
@@ -118,14 +120,6 @@ class Ground(pygame.sprite.Sprite):
         if self.rect.x <= -window_width:
             self.kill()
 
-
-def check_to_quit():
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-            pygame.display.quit()
-            exit()
-
-
 def start_game():
     global scores
     scores = 0
@@ -142,7 +136,10 @@ def start_game():
     bg_music.play(loops=-1)
 
     while True:
-        check_to_quit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                pygame.display.quit()
+                exit()
 
         screen.fill((0, 0, 0))
 
