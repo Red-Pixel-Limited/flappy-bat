@@ -128,6 +128,7 @@ def check_to_quit():
 
 def start_game():
     global scores
+    scores = 0
     bat = pygame.sprite.GroupSingle()
     bat.add(Bat())
 
@@ -205,7 +206,8 @@ def start_game():
 
 def menu():
 
-    manager = pygame_gui.UIManager((window_width, window_height), "./themes/menu.json")
+    manager = pygame_gui.UIManager(
+        (window_width, window_height), "./themes/menu.json")
 
     screen.fill((0, 0, 0))
     screen.blit(sky_pic, (0, 0))
@@ -219,7 +221,7 @@ def menu():
     start_game_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
         (195, 230), (155, 40)),  text="Start", manager=manager)
 
-    pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+    settings_game_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
         (195, 280), (155, 40)),  text="Settings", manager=manager)
 
     while True:
@@ -229,18 +231,16 @@ def menu():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.display.quit()
                 exit()
-            elif event.type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == start_game_btn:
-                    start_game()
+            elif (event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == start_game_btn) or (
+                    event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
+                start_game()
+            elif (event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == settings_game_btn):
+                settings_window = pygame_gui.elements.UIWindow(rect=pygame.Rect((100, 100), (200, 100)), window_display_title="Settings", resizable=True)
+                settings_window.show()
 
             manager.process_events(event)
 
         manager.update(time_delta)
-
-        user_input = pygame.key.get_pressed()
-        if user_input[pygame.K_SPACE]:
-            start_game()
-
         manager.draw_ui(screen)
 
         pygame.display.update()
