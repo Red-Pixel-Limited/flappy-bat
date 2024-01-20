@@ -10,15 +10,7 @@
 from tkinter import *
 
 def register_user():
-    username_data = username.get()
-    password_data = password.get()
-    
-    with open(username_data, "w")as file:
-        file.write(username_data+"\n")
-        file.write(password_data)
-        
-    username_entry.delete(0, END)
-    password_entry.delete(0, END)
+    pass
         
     Label(window1, text = "Registration Sucessful!", fg = "green", font=("calibri", 11)).pack()
     
@@ -46,10 +38,7 @@ def register():
     Button(window1, text = "Register", width = 10, height = 1, command = register_user).pack()
     
 def login_user():
-    username1 = username_verify.get()
-    password1 = password_verify.get()
-    username_entry1.delete(0, END)
-    password_entry1.delete(0, END)
+    pass
     
 def login():
     global window2, username_verify, password_verify, username_entry1, password_entry1
