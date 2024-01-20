@@ -30,6 +30,8 @@ ground_pic = pygame.image.load("images/ground.png")
 bg_music = pygame.mixer.Sound("audio/decisive_battle_loop.wav")
 game_over_sound = pygame.mixer.Sound("audio/decisive_battle_end.wav")
 
+bg_music.set_volume(0.5)
+
 # Tower
 
 top_tower_pic = pygame.image.load("images/tower_top.png")
