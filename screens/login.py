@@ -30,10 +30,7 @@ def register():
     window1.title("Register")
     window1.geometry("300x250")
     
-    global username
-    global password
-    global username_entry
-    global password_entry
+    global username, password, username_entry, password_entry
     username = StringVar()
     password = StringVar()
     
