@@ -208,6 +208,7 @@ def menu():
     screen.fill((0, 0, 0))
     screen.blit(sky_pic, (0, 0))
     screen.blit(ground_pic, (0, 520))
+    screen.blit(bat_pics[0], (100, 250))
     
     x = window_width // 2 - start_game_pic.get_width() // 2
     y = 130

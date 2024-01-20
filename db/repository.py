@@ -3,6 +3,8 @@ import hashlib
 import hmac
 import sqlite3
 from enum import Enum
+from player import *
+from typing import Tuple
 
 
 class DbError(Enum):
@@ -12,18 +14,18 @@ class DbError(Enum):
 
 
 class Repository:
-    def __init__(self, db_file_name='gamers.db'):
+    def __init__(self, db_file_name='players.db'):
         self.db_file_name = db_file_name
 
     def register_user(self, username, password) -> DbError:
         conn = sqlite3.connect(self.db_file_name)
         try:
             cursor = conn.cursor()
-            if cursor.execute('SELECT * FROM gamers WHERE username=?', (username,)).fetchone():
+            if cursor.execute('SELECT * FROM players WHERE username=?', (username,)).fetchone():
                 return DbError.UserAlreadyExists
             salt = os.urandom(16)
             hashed_password = self.__hash_password(password, salt)
-            cursor.execute('INSERT INTO gamers (username, password, salt) VALUES (?, ?, ?)',
+            cursor.execute('INSERT INTO players (username, password, salt) VALUES (?, ?, ?)',
                            (username, hashed_password, salt))
             conn.commit()
             return None
@@ -34,15 +36,41 @@ class Repository:
         conn = sqlite3.connect(self.db_file_name)
         try:
             cursor = conn.cursor()
-            gamer = cursor.execute(
-                'SELECT * FROM gamers WHERE username=?', (username,)).fetchone()
-            if gamer is None:
+            player = cursor.execute(
+                'SELECT * FROM players WHERE username=?', (username,)).fetchone()
+            if player is None:
                 return DbError.UserDoesNotExist
-            hashed_db_password = gamer[1]
-            salt = gamer[2]
+            hashed_db_password = player[1]
+            salt = player[2]
             if not hmac.compare_digest(hashed_db_password, self.__hash_password(password, salt)):
                 return DbError.PasswordDoesNotMatch
             return None
+        finally:
+            conn.close()
+
+    def get_player(self, username) -> Player:
+        conn = sqlite3.connect(self.db_file_name)
+        try:
+            cursor = conn.cursor()
+            record = cursor.execute(
+                'SELECT * FROM players p INNER JOIN settings s ON s.id = p.settings_id WHERE p.username=?', (username,)).fetchone()
+            print(record)
+            if record:
+                username = record[0]
+                volume = record[6]
+                muted = record[7]
+                return Player(username, Settings(Sound(volume, muted)))
+            return None
+        finally:
+            conn.close()
+
+    def get_top_20_players(self) -> list[Tuple[str, int]]:
+        conn = sqlite3.connect(self.db_file_name)
+        try:
+            cursor = conn.cursor()
+            records = cursor.execute(
+                'SELECT username, scores FROM players ORDER BY scores DESC LIMIT 20').fetchall()
+            return list(map(lambda record: (record[0], record[1]), records))
         finally:
             conn.close()
 

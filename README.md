@@ -9,7 +9,7 @@
 To create database
 ```bash
 cd db
-sqlite3 -init schema.sql gamers.db .quit
+sqlite3 -init schema.sql players.db .quit
 ```
 
 ### Activate Environment

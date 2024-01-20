@@ -4,7 +4,7 @@ CREATE TABLE settings(
     mute BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE gamers (
+CREATE TABLE players (
     username TEXT PRIMARY KEY NOT NULL,
     password BLOB NOT NULL,
     salt BLOB NOT NULL,
