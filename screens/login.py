@@ -10,9 +10,11 @@
 from tkinter import *
 
 def register_user():
-    pass
-        
-    Label(window1, text = "Registration Sucessful!", fg = "green", font=("calibri", 11)).pack()
+    if not username_entry.get() or not password_entry.get():
+        Label(window1, text = "Username and password is required", fg = "red", font=("calibri", 11)).pack()
+    
+    else:
+        Label(window1, text = "Registration Sucessful!", fg = "green", font=("calibri", 11)).pack()
     
 def register():
     global window1, username, password, username_entry, password_entry
@@ -38,7 +40,9 @@ def register():
     Button(window1, text = "Register", width = 10, height = 1, command = register_user).pack()
     
 def login_user():
-    pass
+    if not username_verify.get() or not password_verify.get():
+        Label(window2, text = "Username and password is required", fg = "red", font=("calibri", 11)).pack()
+        
     
 def login():
     global window2, username_verify, password_verify, username_entry1, password_entry1
