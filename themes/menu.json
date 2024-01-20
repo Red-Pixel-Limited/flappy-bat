@@ -1,0 +1,33 @@
+{
+    "button": {
+        "colours":
+        {
+            "normal_bg": "#7186d2", 
+            "hovered_bg": "#364064",
+            "normal_text": "#FFFFFF",
+            "hovered_text": "#1b2032",
+            "normal_border": "#1b2032",
+            "hovered_border": "#1b2032",
+            "normal_text_shadow": "#1b2032",
+            "hovered_text_shadow": "#FFFFFF"
+        },
+        "font":
+        {
+            "size": "20",
+            "name": "BubbleboddyNeueTrial",
+            "bold": "0",
+            "regular_resource": {
+                "package": "font",
+                "resource": "BubbleboddyNeueTrialBold.ttf"
+           }
+        },
+        "misc":
+        {
+            "shape": "rounded_rectangle",
+            "shape_corner_radius": "5",
+            "text_shadow_size": "2",
+            "border_width": "1",
+            "shadow_width": "1"
+        }
+    }
+}

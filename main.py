@@ -1,4 +1,5 @@
 import pygame
+import pygame_gui
 from sys import exit
 from random import randint
 from enum import Enum
@@ -13,6 +14,7 @@ scroll_speed = 2
 scores = 0
 
 screen = pygame.display.set_mode((window_width, window_height))
+manager = pygame_gui.UIManager((window_width, window_height), "./themes/menu.json")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("segoeui", 30)
 
@@ -24,7 +26,7 @@ game_over_pic = pygame.image.load("graphics/game_over.png")
 sky_pic = pygame.image.load("graphics/background.png")
 ground_pic = pygame.image.load("graphics/ground.png")
 
-# Sounds 
+# Sounds
 
 bg_music = pygame.mixer.Sound("audio/decisive_battle_loop.wav")
 game_over_sound = pygame.mixer.Sound("audio/decisive_battle_end.wav")
@@ -74,9 +76,11 @@ class Bat(pygame.sprite.Sprite):
             self.jump = True
             self.velocity = -7
 
+
 class TowerPosition(Enum):
     TOP = 1
     BOTTOM = 2
+
 
 class Tower(pygame.sprite.Sprite):
     def __init__(self, x, y, image, tower_pos):
@@ -135,7 +139,7 @@ def start_game():
     ground = pygame.sprite.Group()
     ground.add(Ground(x_posit_ground, y_posit_ground))
 
-    bg_music.play(loops = -1)
+    bg_music.play(loops=-1)
 
     while True:
         check_to_quit()
@@ -163,15 +167,17 @@ def start_game():
             ground.update()
             bat.update(user_input)
 
-        collide_towers = pygame.sprite.spritecollide(bat.sprites()[0], towers, False)
-        collide_ground = pygame.sprite.spritecollide(bat.sprites()[0], ground, False)
+        collide_towers = pygame.sprite.spritecollide(
+            bat.sprites()[0], towers, False)
+        collide_ground = pygame.sprite.spritecollide(
+            bat.sprites()[0], ground, False)
 
         if collide_ground or collide_towers:
 
             if bat.sprite.vital:
                 bat.sprite.vital = False
                 bg_music.stop()
-                game_over_sound.play(loops = 0)
+                game_over_sound.play(loops=0)
 
             screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2,
                                         window_height//2 - game_over_pic.get_height()//2))
@@ -188,7 +194,8 @@ def start_game():
             y_top = randint(-600, -480)
             y_bot = y_top + randint(90, 130) + bottom_tower_pic.get_height()
             towers.add(Tower(x_top, y_top, top_tower_pic, TowerPosition.TOP))
-            towers.add(Tower(x_bot, y_bot, bottom_tower_pic, TowerPosition.BOTTOM))
+            towers.add(
+                Tower(x_bot, y_bot, bottom_tower_pic, TowerPosition.BOTTOM))
             tower_time = randint(180, 250)
         tower_time -= 1
 
@@ -198,19 +205,36 @@ def start_game():
 
 def main():
 
-    while True:
-        check_to_quit()
+    screen.fill((0, 0, 0))
+    screen.blit(sky_pic, (0, 0))
+    screen.blit(ground_pic, (0, 520))
+    screen.blit(bat_pics[0], (100, 250))
 
-        screen.fill((0, 0, 0))
-        screen.blit(sky_pic, (0, 0))
-        screen.blit(ground_pic, (0, 520))
-        screen.blit(bat_pics[0], (100, 250))
-        screen.blit(start_game_pic, (window_width//2 - start_game_pic.get_width()//2,
-                                     window_height//2 - start_game_pic.get_height()//2))
+    x = window_width // 2 - start_game_pic.get_width() // 2
+    y = 130
+    screen.blit(start_game_pic, (x, y)) 
+
+    pygame_gui.elements.UIButton(relative_rect=pygame.Rect((195, 230), (155, 40)),  text="Start", manager=manager)
+
+    pygame_gui.elements.UIButton(relative_rect=pygame.Rect((195, 280), (155, 40)),  text="Settings", manager=manager)
+
+    while True:
+        time_delta = clock.tick(60) / 1000.0
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                pygame.display.quit()
+                exit()
+
+            manager.process_events(event)
+
+        manager.update(time_delta)
 
         user_input = pygame.key.get_pressed()
         if user_input[pygame.K_SPACE]:
             start_game()
+
+        manager.draw_ui(screen)
 
         pygame.display.update()
 
