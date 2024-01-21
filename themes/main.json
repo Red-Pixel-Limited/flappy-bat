@@ -86,5 +86,18 @@
         {
            "border_width": "1"
         }
+    },
+    "#scores_window.text_box": 
+    {
+        "misc":
+        {
+            "border_width": "0",
+            "padding": "30,30",
+            "line_spacing": "1.5"
+        },
+        "font":
+        {
+            "size": "16"
+        }
     }
 }

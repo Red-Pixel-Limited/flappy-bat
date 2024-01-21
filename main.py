@@ -5,6 +5,7 @@ from random import randint
 from enum import Enum
 from windows.scores import ScoresWindow
 from windows.settings import SettingsWindow
+from db.repository import Repository
 from player import *
 
 # Game
@@ -15,9 +16,12 @@ window_height = 700
 window_width = 551
 scroll_speed = 2
 scores_per_game = 0
-player = Player(username="Nick",scores=0,settings=Settings(volume=100))
+player = Player(username="Nick", scores=0, settings=Settings(volume=100))
+repository = Repository(db_file_name='db/players.db')
 
 screen = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption("Flappy bat")
+
 clock = pygame.time.Clock()
 font = pygame.font.Font("font/MetaversRounded.otf", 24)
 
@@ -122,6 +126,7 @@ class Ground(pygame.sprite.Sprite):
         if self.rect.x <= -window_width:
             self.kill()
 
+
 def start_game():
     global scores_per_game
     scores_per_game = 0
@@ -159,7 +164,8 @@ def start_game():
         bat.draw(screen)
 
         scores_color = pygame.Color(255, 255, 255)
-        scores_text = font.render("Scores: " + str(scores_per_game), True, scores_color)
+        scores_text = font.render(
+            "Scores: " + str(scores_per_game), True, scores_color)
 
         screen.blit(scores_text, (20, 20))
 
@@ -185,7 +191,8 @@ def start_game():
 
                 player.scores += scores_per_game
 
-            screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2, window_height//3))
+            screen.blit(game_over_pic, (window_width//2 -
+                        game_over_pic.get_width()//2, window_height//3))
 
             if user_input[pygame.K_r]:
                 start_game()
@@ -210,20 +217,19 @@ def start_game():
 
 
 def menu():
-    global settings_window, scores_window
+    settings_window = None
 
     manager = pygame_gui.UIManager(
         (window_width, window_height), "./themes/main.json")
 
     start_game_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
         (195, 220), (155, 40)),  text="Start", manager=manager)
-    
+
     scores_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
         (195, 270), (155, 40)),  text="Scores", manager=manager)
 
     settings_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
         (195, 320), (155, 40)),  text="Settings", manager=manager)
-    
 
     while True:
         time_delta = clock.tick(60) / 1000.0
@@ -232,15 +238,19 @@ def menu():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.display.quit()
                 exit()
-            elif event.type == pygame_gui.UI_BUTTON_PRESSED: 
+            elif event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == start_game_btn:
                     start_game()
                 elif event.ui_element == scores_btn:
-                    scores_window = ScoresWindow(pygame.Rect((10, 10), (400, 300)), manager=manager)
+                    players = repository.get_top_20_players()
+                    ScoresWindow(pygame.Rect((10, 10), (400, 500)), manager=manager, players=players)
                 elif event.ui_element == settings_btn:
-                    settings_window = SettingsWindow(pygame.Rect((10, 10), (400, 270)), manager=manager, player=player)
-                elif event.ui_element == settings_window.save_btn:
-                    player.settings.volume = int(settings_window.volume_slider.get_current_value())
+                    settings_window = SettingsWindow(pygame.Rect(
+                        (10, 10), (400, 270)), manager=manager, player=player)
+                elif settings_window and event.ui_element == settings_window.save_btn:
+                    player.settings.volume = int(
+                        settings_window.volume_slider.get_current_value())
+                    # repository.update_settings(player)
                     settings_window.kill()
 
             manager.process_events(event)
@@ -249,7 +259,7 @@ def menu():
         screen.blit(sky_pic, (0, 0))
         screen.blit(ground_pic, (0, 520))
         screen.blit(bat_pics[0], (100, 250))
-        
+
         x = window_width // 2 - start_game_pic.get_width() // 2
         y = 120
         screen.blit(start_game_pic, (x, y))
