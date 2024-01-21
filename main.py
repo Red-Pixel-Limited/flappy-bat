@@ -3,6 +3,8 @@ import pygame_gui
 from sys import exit
 from random import randint
 from enum import Enum
+from windows.scores import ScoresWindow
+from windows.settings import SettingsWindow
 
 # Game
 
@@ -201,24 +203,20 @@ def start_game():
 
 
 def menu():
+    global settings_window, scores_window
 
     manager = pygame_gui.UIManager(
-        (window_width, window_height), "./themes/menu.json")
-
-    screen.fill((0, 0, 0))
-    screen.blit(sky_pic, (0, 0))
-    screen.blit(ground_pic, (0, 520))
-    screen.blit(bat_pics[0], (100, 250))
-    
-    x = window_width // 2 - start_game_pic.get_width() // 2
-    y = 130
-    screen.blit(start_game_pic, (x, y))
+        (window_width, window_height), "./themes/main.json")
 
     start_game_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-        (195, 230), (155, 40)),  text="Start", manager=manager)
+        (195, 220), (155, 40)),  text="Start", manager=manager)
+    
+    scores_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+        (195, 270), (155, 40)),  text="Scores", manager=manager)
 
-    settings_game_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-        (195, 280), (155, 40)),  text="Settings", manager=manager)
+    settings_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+        (195, 320), (155, 40)),  text="Settings", manager=manager)
+    
 
     while True:
         time_delta = clock.tick(60) / 1000.0
@@ -227,15 +225,24 @@ def menu():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.display.quit()
                 exit()
-            elif (event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == start_game_btn) or (
-                    event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
-                start_game()
-            elif (event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == settings_game_btn):
-                settings_window = pygame_gui.elements.UIWindow(rect=pygame.Rect(
-                    (100, 100), (200, 100)), window_display_title="Settings", resizable=True)
-                settings_window.show()
+            elif event.type == pygame_gui.UI_BUTTON_PRESSED: 
+                if event.ui_element == start_game_btn:
+                    start_game()
+                elif event.ui_element == scores_btn:
+                    scores_window = ScoresWindow(pygame.Rect((10, 10), (400, 300)), manager=manager)
+                elif event.ui_element == settings_btn:
+                    settings_window = SettingsWindow(pygame.Rect((10, 10), (400, 300)), manager=manager)
 
             manager.process_events(event)
+
+        screen.fill((0, 0, 0))
+        screen.blit(sky_pic, (0, 0))
+        screen.blit(ground_pic, (0, 520))
+        screen.blit(bat_pics[0], (100, 250))
+        
+        x = window_width // 2 - start_game_pic.get_width() // 2
+        y = 120
+        screen.blit(start_game_pic, (x, y))
 
         manager.update(time_delta)
         manager.draw_ui(screen)
