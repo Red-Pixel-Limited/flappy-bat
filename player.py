@@ -17,8 +17,9 @@ class Settings:
 
 
 class Player:
-    def __init__(self, username, settings):
+    def __init__(self, username, scores, settings):
         self.username = username
+        self.scores = scores
         self.settings = settings
     
     def __str__(self):

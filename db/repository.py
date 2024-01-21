@@ -53,13 +53,14 @@ class Repository:
         try:
             cursor = conn.cursor()
             record = cursor.execute(
-                'SELECT * FROM players p INNER JOIN settings s ON s.id = p.settings_id WHERE p.username=?', (username,)).fetchone()
+                'SELECT p.username, p.scores, s.volume, s.mute FROM players p INNER JOIN settings s ON s.id = p.settings_id WHERE p.username=?', (username,)).fetchone()
             print(record)
             if record:
                 username = record[0]
-                volume = record[6]
-                muted = record[7]
-                return Player(username, Settings(Sound(volume, muted)))
+                scores = record[1]
+                volume = record[2]
+                muted = record[3]
+                return Player(username, scores, Settings(Sound(volume, muted)))
             return None
         finally:
             conn.close()

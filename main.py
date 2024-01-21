@@ -5,6 +5,7 @@ from random import randint
 from enum import Enum
 from windows.scores import ScoresWindow
 from windows.settings import SettingsWindow
+from player import *
 
 # Game
 
@@ -13,7 +14,8 @@ pygame.init()
 window_height = 700
 window_width = 551
 scroll_speed = 2
-scores = 0
+scores_per_game = 0
+player = Player(username="Nick",scores=0,settings=Settings(Sound(muted=0,volume=1.0)))
 
 screen = pygame.display.set_mode((window_width, window_height))
 clock = pygame.time.Clock()
@@ -99,7 +101,7 @@ class Tower(pygame.sprite.Sprite):
         if self.rect.x <= -window_width:
             self.kill()
 
-        global scores
+        global scores_per_game
         if self.tower_pos == TowerPosition.BOTTOM:
             if bat_pos[0] > self.rect.topleft[0] and not self.pas:
                 self.enter = True
@@ -107,7 +109,7 @@ class Tower(pygame.sprite.Sprite):
                 self.leave = True
             if self.enter and self.leave and not self.pas:
                 self.pas = True
-                scores += 1
+                scores_per_game += 1
 
 
 class Ground(pygame.sprite.Sprite):
@@ -123,8 +125,8 @@ class Ground(pygame.sprite.Sprite):
             self.kill()
 
 def start_game():
-    global scores
-    scores = 0
+    global scores_per_game
+    scores_per_game = 0
     bat = pygame.sprite.GroupSingle()
     bat.add(Bat())
 
@@ -157,7 +159,7 @@ def start_game():
         bat.draw(screen)
 
         scores_color = pygame.Color(255, 255, 255)
-        scores_text = font.render("Scores: " + str(scores), True, scores_color)
+        scores_text = font.render("Scores: " + str(scores_per_game), True, scores_color)
 
         screen.blit(scores_text, (20, 20))
 
@@ -177,6 +179,7 @@ def start_game():
                 bat.sprite.vital = False
                 bg_music.stop()
                 game_over_sound.play(loops=0)
+                player.scores += scores_per_game
 
             screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2, window_height//3))
 
@@ -231,7 +234,7 @@ def menu():
                 elif event.ui_element == scores_btn:
                     scores_window = ScoresWindow(pygame.Rect((10, 10), (400, 300)), manager=manager)
                 elif event.ui_element == settings_btn:
-                    settings_window = SettingsWindow(pygame.Rect((10, 10), (400, 300)), manager=manager)
+                    settings_window = SettingsWindow(pygame.Rect((10, 10), (400, 300)), manager=manager, player=player)
 
             manager.process_events(event)
 
