@@ -63,6 +63,16 @@ class Repository:
         finally:
             conn.close()
 
+    def update_scores(self, player: Player):
+        conn = sqlite3.connect(self.db_file_name)
+        try:
+            cursor = conn.cursor()
+            cursor.execute('UPDATE players SET scores=? WHERE username=?',
+                           (player.scores, player.username))
+            conn.commit()
+        finally:
+            conn.close()
+
     def update_settings(self, player: Player):
         conn = sqlite3.connect(self.db_file_name)
         try:
@@ -72,9 +82,11 @@ class Repository:
             if id == 1:
                 cursor.execute(
                     'INSERT INTO settings (volume) VALUES (?)', (player.settings.volume,))
-                cursor.execute('UPDATE players SET settings_id=? WHERE username=?', (cursor.lastrowid, player.username))
+                cursor.execute('UPDATE players SET settings_id=? WHERE username=?',
+                               (cursor.lastrowid, player.username))
             else:
-                cursor.execute('UPDATE settings SET volume=? WHERE id=?', (player.settings.volume, id))
+                cursor.execute(
+                    'UPDATE settings SET volume=? WHERE id=?', (player.settings.volume, id))
             conn.commit()
         finally:
             conn.close()
