@@ -58,5 +58,33 @@
             "border_width": "1",
             "shadow_width": "0"
         }
+    },
+    "horizontal_slider.#left_button": 
+    {
+        "images": 
+        {
+            "normal_image": {
+                "package": "images",
+                "resource": "minus.png"
+            }
+        },
+        "misc":
+        {
+           "border_width": "1"
+        }
+    },
+    "horizontal_slider.#right_button": 
+    {
+        "images": 
+        {
+            "normal_image": {
+                "package": "images",
+                "resource": "plus.png"
+            }
+        },
+        "misc":
+        {
+           "border_width": "1"
+        }
     }
 }

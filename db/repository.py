@@ -53,14 +53,12 @@ class Repository:
         try:
             cursor = conn.cursor()
             record = cursor.execute(
-                'SELECT p.username, p.scores, s.volume, s.mute FROM players p INNER JOIN settings s ON s.id = p.settings_id WHERE p.username=?', (username,)).fetchone()
-            print(record)
+                'SELECT p.username, p.scores, s.volume FROM players p INNER JOIN settings s ON s.id = p.settings_id WHERE p.username=?', (username,)).fetchone()
             if record:
                 username = record[0]
                 scores = record[1]
                 volume = record[2]
-                muted = record[3]
-                return Player(username, scores, Settings(Sound(volume, muted)))
+                return Player(username, scores, Settings(volume))
             return None
         finally:
             conn.close()
@@ -73,11 +71,10 @@ class Repository:
                 'SELECT settings_id FROM players WHERE username=?', (player.username,)).fetchone()[0]
             if id == 1:
                 cursor.execute(
-                    'INSERT INTO settings (volume, mute) VALUES (?, ?)', (player.settings.sound.volume, player.settings.sound.muted))
+                    'INSERT INTO settings (volume) VALUES (?)', (player.settings.volume,))
                 cursor.execute('UPDATE players SET settings_id=? WHERE username=?', (cursor.lastrowid, player.username))
             else:
-                cursor.execute('UPDATE settings SET volume=?, mute=? WHERE id=?',
-                           (player.settings.sound.volume, player.settings.sound.muted, id))
+                cursor.execute('UPDATE settings SET volume=? WHERE id=?', (player.settings.volume, id))
             conn.commit()
         finally:
             conn.close()

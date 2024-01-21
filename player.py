@@ -1,19 +1,12 @@
-
-class Sound:
-    def __init__(self, volume, muted):
-        self.volume = volume
-        self.muted = muted
-    
-    def __str__(self):
-        return f'Sound(volume={self.volume}, muted={self.muted})'
-
-
 class Settings:
-    def __init__(self, sound):
-        self.sound = sound
+    def __init__(self, volume):
+        self.volume = volume
+
+    def sound_on(self) -> bool:
+        return self.volume > 0
 
     def __str__(self):
-        return f'Settings(sound={self.sound})'    
+        return f'Settings(volume={self.volume})'    
 
 
 class Player:

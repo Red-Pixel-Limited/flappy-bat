@@ -15,7 +15,7 @@ window_height = 700
 window_width = 551
 scroll_speed = 2
 scores_per_game = 0
-player = Player(username="Nick",scores=0,settings=Settings(Sound(muted=0,volume=1.0)))
+player = Player(username="Nick",scores=0,settings=Settings(volume=100))
 
 screen = pygame.display.set_mode((window_width, window_height))
 clock = pygame.time.Clock()
@@ -33,8 +33,6 @@ ground_pic = pygame.image.load("images/ground.png")
 
 bg_music = pygame.mixer.Sound("audio/decisive_battle_loop.wav")
 game_over_sound = pygame.mixer.Sound("audio/decisive_battle_end.wav")
-
-bg_music.set_volume(0.5)
 
 # Tower
 
@@ -137,7 +135,9 @@ def start_game():
     ground = pygame.sprite.Group()
     ground.add(Ground(x_posit_ground, y_posit_ground))
 
-    bg_music.play(loops=-1)
+    if player.settings.sound_on():
+        bg_music.set_volume(player.settings.volume / 100)
+        bg_music.play(loops=-1)
 
     while True:
         for event in pygame.event.get():
@@ -177,8 +177,12 @@ def start_game():
 
             if bat.sprite.vital:
                 bat.sprite.vital = False
-                bg_music.stop()
-                game_over_sound.play(loops=0)
+
+                if player.settings.sound_on():
+                    bg_music.stop()
+                    game_over_sound.set_volume(player.settings.volume / 100)
+                    game_over_sound.play(loops=0)
+
                 player.scores += scores_per_game
 
             screen.blit(game_over_pic, (window_width//2 - game_over_pic.get_width()//2, window_height//3))
@@ -234,7 +238,10 @@ def menu():
                 elif event.ui_element == scores_btn:
                     scores_window = ScoresWindow(pygame.Rect((10, 10), (400, 300)), manager=manager)
                 elif event.ui_element == settings_btn:
-                    settings_window = SettingsWindow(pygame.Rect((10, 10), (400, 300)), manager=manager, player=player)
+                    settings_window = SettingsWindow(pygame.Rect((10, 10), (400, 270)), manager=manager, player=player)
+                elif event.ui_element == settings_window.save_btn:
+                    player.settings.volume = int(settings_window.volume_slider.get_current_value())
+                    settings_window.kill()
 
             manager.process_events(event)
 
