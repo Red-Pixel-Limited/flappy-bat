@@ -2,7 +2,6 @@ from tkinter import *
 from windows.login import LoginWindow
 from flappy_bat import FlappyBatGame
 from db.repository import Repository
-from player import *
 
 repository = Repository(db_file_name='db/players.db')
 
@@ -19,6 +18,7 @@ def main():
     if login_window.authenticated_user:
         FlappyBatGame(window_height=700, window_width=551,
                       player=login_window.authenticated_user, repository=repository).display_menu()
+
 
 if __name__ == '__main__':
     main()

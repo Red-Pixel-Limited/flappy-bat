@@ -21,12 +21,12 @@ class Repository:
         conn = sqlite3.connect(self.db_file_name)
         try:
             cursor = conn.cursor()
-            if cursor.execute('SELECT * FROM players WHERE username=?', (username,)).fetchone():
+            if cursor.execute('SELECT * FROM players WHERE lower_username=?', (username.lower(),)).fetchone():
                 return DbError.UserAlreadyExists
             salt = os.urandom(16)
             hashed_password = self.__hash_password(password, salt)
-            cursor.execute('INSERT INTO players (username, password, salt) VALUES (?, ?, ?)',
-                           (username, hashed_password, salt))
+            cursor.execute('INSERT INTO players (username, lower_username, password, salt) VALUES (?, ?, ?, ?)',
+                           (username, username.lower(), hashed_password, salt))
             conn.commit()
             return None
         finally:
@@ -36,12 +36,12 @@ class Repository:
         conn = sqlite3.connect(self.db_file_name)
         try:
             cursor = conn.cursor()
-            player = cursor.execute(
-                'SELECT * FROM players WHERE username=?', (username,)).fetchone()
-            if player is None:
+            record = cursor.execute(
+                'SELECT password, salt FROM players WHERE lower_username=?', (username.lower(),)).fetchone()
+            if record is None:
                 return DbError.UserDoesNotExist
-            hashed_db_password = player[1]
-            salt = player[2]
+            hashed_db_password = record[0]
+            salt = record[1]
             if not hmac.compare_digest(hashed_db_password, self.__hash_password(password, salt)):
                 return DbError.PasswordDoesNotMatch
             return None
@@ -53,12 +53,14 @@ class Repository:
         try:
             cursor = conn.cursor()
             record = cursor.execute(
-                'SELECT p.username, p.scores, s.volume FROM players p INNER JOIN settings s ON s.id = p.settings_id WHERE p.username=?', (username,)).fetchone()
+                'SELECT p.username, p.scores, s.volume, s.lift_key ' +
+                'FROM players p INNER JOIN settings s ON s.id = p.settings_id WHERE p.lower_username=?', (username.lower(),)).fetchone()
             if record:
                 username = record[0]
                 scores = record[1]
                 volume = record[2]
-                return Player(username, scores, Settings(volume))
+                key = record[3]
+                return Player(username, scores, Settings(volume=volume, lift_key=key))
             return None
         finally:
             conn.close()
@@ -67,8 +69,8 @@ class Repository:
         conn = sqlite3.connect(self.db_file_name)
         try:
             cursor = conn.cursor()
-            cursor.execute('UPDATE players SET scores=? WHERE username=?',
-                           (player.scores, player.username))
+            cursor.execute('UPDATE players SET scores=? WHERE lower_username=?',
+                           (player.scores, player.username.lower()))
             conn.commit()
         finally:
             conn.close()
@@ -81,12 +83,12 @@ class Repository:
                 'SELECT settings_id FROM players WHERE username=?', (player.username,)).fetchone()[0]
             if id == 1:
                 cursor.execute(
-                    'INSERT INTO settings (volume) VALUES (?)', (player.settings.volume,))
-                cursor.execute('UPDATE players SET settings_id=? WHERE username=?',
-                               (cursor.lastrowid, player.username))
+                    'INSERT INTO settings (volume, lift_key) VALUES (?, ?)', (player.settings.volume, player.settings.lift_key))
+                cursor.execute('UPDATE players SET settings_id=? WHERE lower_username=?',
+                               (cursor.lastrowid, player.username.lower()))
             else:
                 cursor.execute(
-                    'UPDATE settings SET volume=? WHERE id=?', (player.settings.volume, id))
+                    'UPDATE settings SET volume=?, lift_key=? WHERE id=?', (player.settings.volume, player.settings.lift_key, id))
             conn.commit()
         finally:
             conn.close()

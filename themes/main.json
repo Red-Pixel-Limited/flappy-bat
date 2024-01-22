@@ -99,5 +99,26 @@
         {
             "size": "16"
         }
+    },
+    "drop_down_menu":
+    {
+        "misc":
+        {
+            "border_width": "1"
+        }
+    },
+    "drop_down_menu.#expand_button":
+    {
+        "images": 
+        {
+            "normal_image": {
+                "package": "images",
+                "resource": "down_arrow.png"
+            }
+        },
+        "misc":
+        {
+           "border_width": "2"
+        }
     }
 }

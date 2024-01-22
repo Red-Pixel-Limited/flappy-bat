@@ -1,10 +1,12 @@
 CREATE TABLE settings(
     id INTEGER PRIMARY KEY NOT NULL,
-    volume INTEGER NOT NULL DEFAULT 100
+    volume INTEGER NOT NULL DEFAULT 100,
+    lift_key TEXT NOT NULL DEFAULT 'Space'
 );
 
 CREATE TABLE players (
     username TEXT PRIMARY KEY NOT NULL,
+    lower_username TEXT NOT NULL,
     password BLOB NOT NULL,
     salt BLOB NOT NULL,
     scores INTEGER NOT NULL DEFAULT 0,

@@ -41,3 +41,7 @@ rm -rf venv
 #### Windows
 
 TBD
+
+#### Notes
+
+Please note that to run application the Python of version 3.11+ is required.

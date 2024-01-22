@@ -6,14 +6,15 @@ from enum import Enum
 from windows.scores import ScoresWindow
 from windows.settings import SettingsWindow
 from db.repository import Repository
-from player import Player
+from player import *
 from pygame_gui import UIManager
 from pygame_gui.elements import UIButton
 from pygame.sprite import Sprite, GroupSingle, Group
 from pygame.rect import Rect
 
+
 class Bat(Sprite):
-    def __init__(self, bat_pics, bat_pos):
+    def __init__(self, bat_pics, bat_pos, lift_key):
         Sprite.__init__(self)
         self.bat_pics = bat_pics
         self.image = bat_pics[0]
@@ -23,6 +24,7 @@ class Bat(Sprite):
         self.velocity = 0
         self.jump = False
         self.vital = True
+        self.lift_key = lift_key
 
     def update(self, user_input):
         if self.vital:
@@ -41,7 +43,7 @@ class Bat(Sprite):
 
         self.image = pygame.transform.rotate(self.image, self.velocity * -7)
 
-        if user_input[pygame.K_SPACE] and not self.jump and self.rect.y > 0 and self.vital:
+        if user_input[self.lift_key] and not self.jump and self.rect.y > 0 and self.vital:
             self.jump = True
             self.velocity = -7
 
@@ -129,11 +131,25 @@ class FlappyBatGame:
         bat_icon = pygame.image.load("images/bat.png").convert_alpha()
         pygame.display.set_icon(bat_icon)
 
+        self.pygame_keys = {
+            LiftKey.Space: pygame.K_SPACE,
+            LiftKey.Up: pygame.K_UP,
+            LiftKey.W: pygame.K_w
+        }
+
     def start(self):
         self.scores_per_game = 0
 
+        match self.player.settings.lift_key:
+            case "space":
+                self.bat_pos = (100, 250)
+                self.bat_pics = [
+                    pygame.image.load("images/bat_up.png").convert_alpha(),
+                    pygame.image.load("images/bat_down.png").convert_alpha(),
+                    pygame.image.load("images/bat_mid.png").convert_alpha()]
+                
         bat = GroupSingle()
-        bat.add(Bat(self.bat_pics, self.bat_pos))
+        bat.add(Bat(self.bat_pics, self.bat_pos, lift_key=self.pygame_keys[self.player.settings.lift_key]))
 
         tower_time = 0
         towers = Group()
@@ -176,10 +192,8 @@ class FlappyBatGame:
                 ground.update(self)
                 bat.update(user_input)
 
-            collide_towers = pygame.sprite.spritecollide(
-                bat.sprites()[0], towers, False)
-            collide_ground = pygame.sprite.spritecollide(
-                bat.sprites()[0], ground, False)
+            collide_towers = pygame.sprite.spritecollide(bat.sprites()[0], towers, False)
+            collide_ground = pygame.sprite.spritecollide(bat.sprites()[0], ground, False)
 
             if collide_ground or collide_towers:
 
@@ -188,8 +202,7 @@ class FlappyBatGame:
 
                     if self.player.settings.sound_on():
                         self.bg_music.stop()
-                        self.game_over_sound.set_volume(
-                            self.player.settings.volume / 100)
+                        self.game_over_sound.set_volume(self.player.settings.volume / 100)
                         self.game_over_sound.play(loops=0)
 
                     self.player.scores += self.scores_per_game
@@ -211,10 +224,8 @@ class FlappyBatGame:
                 y_top = randint(-600, -480)
                 y_bot = y_top + randint(90, 130) + \
                     self.bottom_tower_pic.get_height()
-                towers.add(
-                    Tower(x_top, y_top, self.top_tower_pic, TowerPosition.TOP))
-                towers.add(
-                    Tower(x_bot, y_bot, self.bottom_tower_pic, TowerPosition.BOTTOM))
+                towers.add(Tower(x_top, y_top, self.top_tower_pic, TowerPosition.TOP))
+                towers.add(Tower(x_bot, y_bot, self.bottom_tower_pic, TowerPosition.BOTTOM))
                 tower_time = randint(180, 250)
             tower_time -= 1
 
@@ -244,9 +255,10 @@ class FlappyBatGame:
                         players = self.repository.get_top_20_players()
                         ScoresWindow(Rect((10, 10), (400, 500)), manager=manager, players=players)
                     elif event.ui_element == settings_btn:
-                        settings_window = SettingsWindow(Rect((10, 10), (400, 270)), manager=manager, player=self.player)
+                        settings_window = SettingsWindow(Rect((10, 10), (400, 320)), manager=manager, player=self.player)
                     elif settings_window and event.ui_element == settings_window.save_btn:
                         self.player.settings.volume = int(settings_window.volume_slider.get_current_value())
+                        self.player.settings.lift_key = settings_window.keys_list.selected_option
                         self.repository.update_settings(self.player)
                         settings_window.kill()
 
