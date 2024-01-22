@@ -4,10 +4,11 @@ from pygame_gui.elements import UIButton
 from pygame_gui.elements import UILabel
 from pygame_gui.elements import UIHorizontalSlider
 from pygame_gui.elements import UIDropDownMenu
+from pygame_gui.elements import UIWindow
 from player import Player, LiftKey
 
 
-class SettingsWindow(pygame_gui.elements.UIWindow):
+class SettingsWindow(UIWindow):
     def __init__(self, rect, manager, player: Player):
         super().__init__(rect, manager,
                          window_display_title="Settings",

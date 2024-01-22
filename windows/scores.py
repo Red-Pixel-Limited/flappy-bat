@@ -1,10 +1,9 @@
 import pygame
-import pygame_gui
 from typing import Tuple
-from pygame_gui.elements import UITextBox
+from pygame_gui.elements import UITextBox, UIWindow
 
 
-class ScoresWindow(pygame_gui.elements.UIWindow):
+class ScoresWindow(UIWindow):
     def __init__(self, rect, manager, players: list[Tuple[str, int]]):
         super().__init__(rect, manager,
                          window_display_title="Top players",
