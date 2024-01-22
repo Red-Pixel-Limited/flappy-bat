@@ -44,6 +44,9 @@ bat_pics = [pygame.image.load("images/bat_up.png").convert_alpha(),
             pygame.image.load("images/bat_down.png").convert_alpha(),
             pygame.image.load("images/bat_mid.png").convert_alpha()]
 
+bat_icon = pygame.image.load("images/bat.png").convert_alpha()
+pygame.display.set_icon(bat_icon)
+
 # Entities
 
 
