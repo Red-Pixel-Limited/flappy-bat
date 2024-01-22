@@ -7,6 +7,7 @@ from player import *
 repository = Repository(db_file_name='db/players.db')
 
 def main():
+
     root = Tk()
     root.geometry("315x150+600+400")
     root.resizable(False, False)
@@ -14,7 +15,7 @@ def main():
     login_window = LoginWindow(root, repository)
     root.mainloop()
 
-    login_window.authenticated_user
+    print(login_window.authenticated_user)
 
     # FlappyBird(player=player, repository=repository).display_menu()
 
