@@ -69,8 +69,8 @@ class Repository:
         conn = sqlite3.connect(self.db_file_name)
         try:
             cursor = conn.cursor()
-            cursor.execute('UPDATE players SET scores=? WHERE lower_username=?',
-                           (player.scores, player.username.lower()))
+            cursor.execute('UPDATE players SET scores=? WHERE username=?',
+                           (player.scores, player.username))
             conn.commit()
         finally:
             conn.close()
@@ -84,8 +84,8 @@ class Repository:
             if id == 1:
                 cursor.execute(
                     'INSERT INTO settings (volume, lift_key) VALUES (?, ?)', (player.settings.volume, player.settings.lift_key))
-                cursor.execute('UPDATE players SET settings_id=? WHERE lower_username=?',
-                               (cursor.lastrowid, player.username.lower()))
+                cursor.execute('UPDATE players SET settings_id=? WHERE username=?',
+                               (cursor.lastrowid, player.username))
             else:
                 cursor.execute(
                     'UPDATE settings SET volume=?, lift_key=? WHERE id=?', (player.settings.volume, player.settings.lift_key, id))

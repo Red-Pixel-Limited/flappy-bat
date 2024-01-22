@@ -17,4 +17,6 @@ CREATE TABLE players (
             ON UPDATE NO ACTION
 );
 
+CREATE INDEX lower_cased_username_index ON players (lower_username);
+
 INSERT INTO settings (id) VALUES (1);
