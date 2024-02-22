@@ -48,7 +48,7 @@ TBD
 
 Please note that to run application the Python of version 3.11+ is required.
 
-### User Manual
+## User Manual
 
 To start a game, the user must login first. If the user does not exist yet, enter the name of the user and password, then press register to create user.
 
